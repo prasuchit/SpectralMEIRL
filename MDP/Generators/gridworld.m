@@ -11,10 +11,10 @@ for y = 1:gridSize
     for x = 1:gridSize
         s = loc2s(x, y, gridSize);
         ns    = zeros(4, 1);
-        ns(1) = loc2s(x, y - 1, gridSize);
-        ns(2) = loc2s(x, y + 1, gridSize);
-        ns(3) = loc2s(x - 1, y, gridSize);
-        ns(4) = loc2s(x + 1, y, gridSize);
+        ns(1) = loc2s(x, y + 1, gridSize); %N
+        ns(2) = loc2s(x + 1, y, gridSize); %E
+        ns(3) = loc2s(x - 1, y, gridSize); %W
+        ns(4) = loc2s(x, y - 1, gridSize); %S
         for a = 1:nA
             for a2 = 1:nA
                 T(ns(a2), s, a) = T(ns(a2), s, a) + noise/nA;
@@ -63,12 +63,12 @@ start = start./sum(start);
 
 % weight vector
 weight = zeros(nF, 1);
-l = randperm(nF - 1);
-k = ceil(0.3*nF);
-% k = ceil(log(nF));
-idx = l(1:k);
-weight(idx) = rand(k, 1) - 1;
-weight(end) = 1;
+% l = randperm(nF - 1);
+% k = ceil(0.3*nF);
+% % k = ceil(log(nF));
+% idx = l(1:k);
+% weight(idx) = rand(k, 1) - 1;
+% weight(end) = 1;
 %weight = weight./norm(weight, 1);
 
 % generate blockSizeDP
@@ -79,7 +79,7 @@ mdp.nStates    = nS;
 mdp.nActions   = nA;
 mdp.nFeatures  = nF;
 mdp.discount   = discount;
-mdp.useSparse  = 1;
+mdp.useSparse  = 0;
 mdp.start      = start;
 mdp.transition = T;
 mdp.F          = repmat(F, nA, 1);
@@ -103,7 +103,7 @@ if nargin >= 5 && bprint
     elapsedTime = toc;
     
     fprintf('== %s ==\n', mdp.name);
-    actstr = 'NSWE';
+    actstr = 'NEWS';
     for y = 1:gridSize
         for x = 1:gridSize
             s = loc2s(x, y, gridSize);

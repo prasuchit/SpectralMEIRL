@@ -30,7 +30,8 @@ else
         fprintf('- Generate %d-th weight\n', i);
         RandStream.setGlobalStream(RandStream.create('mrg32k3a', ...
             'NumStreams', 1, 'Seed', problem.seed + i));
-        w   = sampleWeight(problem.name, nF, i);
+        j = 2;  % safe driver
+        w   = sampleWeight(problem.name, nF, j);
         mdp = convertW2R(w, mdp);
         
         RandStream.setGlobalStream(RandStream.create('mrg32k3a', ...
@@ -59,13 +60,19 @@ fprintf('%.4f\n', optValue);
 meanThreshold = 1;
 varThreshold = 1;
 fprintf('  Sample %d trajectories : ', problem.nTrajs);
-while 1
-    [trajs, trajVmean, trajVvar] = sampleTrajectories(problem.nTrajs, ...
-        problem.nSteps, policy, mdp);
-    if abs(optValue - trajVmean) < meanThreshold && trajVvar < varThreshold
-        break;
+if(mdp.useSparse == 1)
+    while 1
+        [trajs, trajVmean, trajVvar] = sampleTrajectories(problem.nTrajs, ...
+            problem.nSteps, policy, mdp);
+        if abs(optValue - trajVmean) < meanThreshold && trajVvar < varThreshold
+            break;
+        end
     end
+else
+    [trajs, trajVmean, trajVvar] = sampleTrajectories(problem.nTrajs, ...
+            problem.nSteps, policy, mdp);
 end
+
 fprintf('%.4f (%.4f)\n', trajVmean, trajVvar);
 
 end
@@ -147,7 +154,8 @@ elseif strcmp(name, 'gridworld2')
     
 elseif strcmp(name, 'gridworld')
     %w = -rand(nF, 1);
-    w = rand(nF, 1);
+%     w = rand(nF, 1);
+    w(end) = 1;
     
 end
 

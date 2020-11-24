@@ -5,12 +5,12 @@ configPath([], true);
 probName = 'gridworld';
 
 k = 1;
-% alg{k}.name    = 'Ind_BIRL';
-% alg{k}.llhType   = 'BIRL';
-% alg{k}.priorType = 'Uniform';
-% alg{k}.lw = 1;
-% alg{k}.lt = ':';
-% k = k + 1;
+alg{k}.name    = 'Ind_BIRL';
+alg{k}.llhType   = 'BIRL';
+alg{k}.priorType = 'Gaussian';
+alg{k}.lw = 1;
+alg{k}.lt = ':';
+k = k + 1;
 % 
 % alg{k}.name    = 'EM_IRL';
 % alg{k}.nClust  = 1;
@@ -43,12 +43,12 @@ k = 1;
 % alg{k}.lt = '--';
 % k = k + 1;
 
-alg{k}.name    = 'DPM_BIRL_MHL';
-alg{k}.llhType   = 'BIRL';
-alg{k}.priorType = 'Un';
-alg{k}.lw = 2;
-alg{k}.lt = '-';
-k = k + 1;
+% alg{k}.name    = 'DPM_BIRL_MHL';
+% alg{k}.llhType   = 'BIRL';
+% alg{k}.priorType = 'Un';
+% alg{k}.lw = 2;
+% alg{k}.lt = '-';
+% k = k + 1;
 
 problem  = problemParamsME(probName);
 nAlgs    = length(alg);

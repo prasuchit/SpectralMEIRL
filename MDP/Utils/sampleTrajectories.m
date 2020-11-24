@@ -4,7 +4,8 @@ function [trajs, Vmean, Vvar] = sampleTrajectories(nTrajs, nSteps, piL, mdp)
 trajs  = zeros(nTrajs, nSteps, 2);
 vList  = zeros(nTrajs, 1);
 for m = 1:nTrajs
-    s = sampleMultinomial(mdp.start); % sample start state
+%     s = sampleMultinomial(mdp.start); % sample start state
+    s = 1;
     v = 0;
     for h = 1:nSteps
         a = piL(s);
@@ -22,5 +23,5 @@ for m = 1:nTrajs
 end
 Vmean = mean(vList);
 Vvar  = var(vList);
-
+% trajInfo = getTrajInfo(trajs, mdp);
 end

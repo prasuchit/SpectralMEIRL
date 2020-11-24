@@ -12,10 +12,13 @@ for iter = problem.iters
     mdp  = generateProblem(problem, problem.seed, problem.discount);
     data = generateDemonstration(mdp, problem);
     
+    simulateHighway3(mdp, mdp.weight, problem.nSteps)
+    
     % IRL
     RandStream.setGlobalStream(RandStream.create('mrg32k3a', ...
         'NumStreams', 1, 'Seed', problem.seed));
     tic;
+    fprintf('\nCalling MAP BIRL now: ');
     [wL, logPost] = feval(irlOpts.alg, data.trajSet, [], mdp, irlOpts);
     elapsedTime = toc;
     
@@ -27,7 +30,7 @@ for iter = problem.iters
     hst{iter}.wL   = wL;
     hst{iter}.data = data;
     hst{iter}.mdp  = mdp;
-    wL- data.weight
+    wL - data.weight
 end
 disp(['total time:',num2str(etime(clock,t1))]);
 

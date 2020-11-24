@@ -31,12 +31,18 @@ for iter = 1:MAX_ITERS
     if SHOW_MSG == 1
         v0   = full(mdp.start'*V);
         diff = norm(V-oldV);
-        fprintf('%d | %f %d %.20f\n', iter, v0, full(done), full(diff));
+        fprintf('\nIteration: %d | Value: %f | Done: %d | Diff: %.20f\n', iter, v0, full(done), full(diff));
     end
     if done, break; end
     
     oldpi = piL;
     oldV  = V;
 end
-
+% fprintf('\nExpert Policy: \n');
+% actstr = 'NSWE';
+% for y = 1:size(piL)
+%     a = actstr(piL(y));
+%     fprintf('%2d -> %1s; ', y, a);
+% end
+% fprintf('\n');
 end

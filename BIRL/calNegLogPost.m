@@ -2,7 +2,7 @@
 %
 function [post, grad, prior, llh] = calNegLogPost(w, ...
     piL, H, dQ, trajInfo, mdp, opts)
-
+% fprintf('\nInside calNegLogPost');
 if nargout == 1
     llh   = calLogLLH(w, trajInfo, piL, H, dQ, mdp, opts);
     prior = calLogPrior(w, opts);
@@ -21,5 +21,5 @@ if isinf(post)
     fprintf('ERROR: prior: %f, llh:%f, eta:%f, w:%f %f \n', ...
         prior, llh, opts.eta, full(min(w)), full(max(w)));
 end
-
+% fprintf('\nLeaving calNegLogPost');
 end

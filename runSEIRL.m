@@ -1,5 +1,5 @@
 % Script for run the experiments of IRL algorithms with a single expert
-
+clc
 close all;
 clear all;
 LASTN = maxNumCompThreads(1);
@@ -8,10 +8,10 @@ alg.name = 'MAP_BIRL';
 
 alg.llhType = 'BIRL'; 
 
-alg.priorType = 'Uniform';
+alg.priorType = 'Gaussian';
 
-probName = 'gridworld';
-% probName = 'highway3';
+% probName = 'gridworld';
+probName = 'highway3';
 
 configPath(alg.name, true);
 

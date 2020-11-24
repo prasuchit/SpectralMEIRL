@@ -6,6 +6,7 @@
 function [wL, logPost] = MAP_BIRL(trajs, w0, mdp, opts)
 
 % build distribution for 1d reward value
+% fprintf('\nInside MAP_BIRL');
 if strcmp(opts.priorType, 'NG') || strcmp(opts.priorType, 'BG')
     if ~isfield(opts, 'rlist') || isempty(opts.rlist) ...
         || ~isfield(opts, 'rdist') || isempty(opts.rdist)
@@ -16,6 +17,7 @@ end
 nF = mdp.nFeatures;
 lb = repmat(opts.lb(1), nF, 1);
 ub = repmat(opts.ub(1), nF, 1);
+% trajs(:,:,:) = -1
 trajInfo = getTrajInfo(trajs, mdp);
 objFunc  = @(x)calNegLogPost(x, [], [], [], trajInfo, mdp, opts);
 
@@ -36,7 +38,7 @@ for iter = 1:opts.restart
     end
     
     [w, val] = fmincon(objFunc, w0, [], [], [], [], lb, ub, [], options);
-    
+%     fprintf('\nLeaving MAP_BIRL');
     if sol.v < -val
         sol.v = -val;
         sol.w = w;

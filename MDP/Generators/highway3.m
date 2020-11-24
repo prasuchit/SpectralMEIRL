@@ -16,7 +16,7 @@ nF = 1 + nLanes + nSpeeds;  % collision, lanes, speeds
 T  = zeros(nS, nS, nA);     % state transition probability
 F  = zeros(nS, nF);         % state feature
 for s = 1:nS
-    [spd, myx, y1, y2, y3] = sid2info(s, nSpeeds, nLanes, nGrids);
+    [spd, myx, Y] = sid2info(s, nSpeeds, nLanes, nGrids);
     
     nX = zeros(nA, 2);
     nX(1, :) = [spd, myx];                     % nop
@@ -26,7 +26,7 @@ for s = 1:nS
     nX(5, :) = [max(1, spd - 1), myx];         % speed down
     
     % location of other cars
-    Y    = [y1, y2, y3];  
+%     Y    = [y1, y2, y3];  
     idx1 = find(Y > 1);
     idx2 = find(Y == 1);
     
@@ -40,7 +40,6 @@ for s = 1:nS
     nY = cat(1, nY, Y2);
     nY(:, idx1) = nY(:, idx1) + spd;
     nY(nY > nGrids) = 1;
-    
     nY = cat(2, nY, zeros(size(nY, 1), 1));
     for i = 1:size(nY, 1)
         p = 1;
@@ -55,26 +54,26 @@ for s = 1:nS
     end
     p = 1 - sum(nY(:, nLanes + 1));
     nY(end, nLanes + 1) = nY(end, nLanes + 1) + p;
-
+    
     for a = 1:nA
         % calculate transition probability
         for i = 1:size(nY, 1)
-            ns = info2sid(nX(a, 1), nX(a, 2), nY(i, 1), nY(i, 2), nY(i, 3), ...
+            ns = info2sid(nX(a, 1), nX(a, 2), nY(i, :), ...
                 nSpeeds, nLanes, nGrids);
             if a == 2 || a == 3
                 pr = succProb(1, spd)^(spd - 1);
-                T(ns, s, a) = T(ns, s, a) + nY(i, 4) * pr;
-                ns2 = info2sid(spd, myx, nY(i, 1), nY(i, 2), nY(i, 3), ...
+                T(ns, s, a) = T(ns, s, a) + nY(i, end) * pr;
+                ns2 = info2sid(spd, myx, nY(i,:), ...
                     nSpeeds, nLanes, nGrids);
-                T(ns2, s, a) = T(ns2, s, a) + nY(i, 4) * (1 - pr);
+                T(ns2, s, a) = T(ns2, s, a) + nY(i, end) * (1 - pr);
             elseif a == 4 || a == 5
                 pr = succProb(2, spd)^(spd - 1);
-                T(ns, s, a) = T(ns, s, a) + nY(i, 4) * pr;
-                ns2 = info2sid(spd, myx, nY(i, 1), nY(i, 2), nY(i, 3), ...
+                T(ns, s, a) = T(ns, s, a) + nY(i, end) * pr;
+                ns2 = info2sid(spd, myx, nY(i,:), ...
                     nSpeeds, nLanes, nGrids);
-                T(ns2, s, a) = T(ns2, s, a) + nY(i, 4) * (1 - pr);
+                T(ns2, s, a) = T(ns2, s, a) + nY(i, end) * (1 - pr);
             else
-                T(ns, s, a) = nY(i, 4);
+                T(ns, s, a) = nY(i,end);
             end 
         end
     end
@@ -82,13 +81,11 @@ for s = 1:nS
     % calculate feature
     f = zeros(nF, 1);
     
-    % check collision
-    f(1) = Y(myx) > nGrids - carSize*2 && Y(myx) < nGrids;
+    f(1) = Y(myx) > nGrids - carSize*2 && Y(myx) < nGrids;  % check collision
     f(1 + myx) = 1;             % lane
     f(1 + nLanes + spd) = 1;    % speed
     F(s, :) = f';
 end
-
 % check transition probability
 for a = 1:nA
     for s = 1:nS
@@ -101,18 +98,18 @@ end
 
 % initial state distribution
 start     = zeros(nS, 1);
-s0        = info2sid(1, 2, 1, 1, 1, nSpeeds, nLanes, nGrids);
+s0        = info2sid(1, 2,ones(1,nLanes), nSpeeds, nLanes, nGrids);
 start(s0) = 1;
 
 % weight for reward
 w = zeros(nF, 1);
 % fast driver avoids collisions and prefers high speed
-w(1) = -1;      % collision
-w(end) = 0.1;   % high speed
+% w(1) = -1;      % collision
+% w(end) = 0.1;   % high speed
 
 % % safe driver avoids collisions and prefers right-most lane
-% w(1) = -1;
-% w(1 + nLanes) = 0.1;
+w(1) = -1;
+w(1 + nLanes) = 0.1;
 
 % % demolition prefers collisions and high-speed
 % w(1) = 1;
@@ -130,7 +127,7 @@ mdp.nStates    = nS;
 mdp.nActions   = nA;
 mdp.nFeatures  = nF;
 mdp.discount   = discount;
-mdp.useSparse  = 1;
+mdp.useSparse  = 0;
 mdp.start      = start;
 mdp.F          = repmat(F, nA, 1);
 mdp.transition = T;
@@ -160,7 +157,7 @@ if nargin >= 2 && bprint
         'NumStreams', 1, 'Seed', seed));
     fprintf('sample trajectory\n');
     nTrajs = 1;
-    nSteps = 5000;
+    nSteps = 100;
     [trajs, trajVmean, trajVvar] = ...
         sampleTrajectories(nTrajs, nSteps, policy, mdp);
     

@@ -3,7 +3,7 @@
 %
 function [llh, grad] = calLogLLH_BIRL(w, eta, ...
     trajInfo, piL, H, dQ, mdp)
-
+% fprintf('\nInside calLogLLH_BIRL');
 mdp = convertW2R(w, mdp);
 if isempty(piL) || isempty(H)
     [piL, ~, QL, ~] = policyIteration(mdp);
@@ -44,7 +44,6 @@ if nargout == 2
         z = eta.*bsxfun(@minus, x, y);
         dlogPi(f, :) = reshape(z, 1, nS*nA);
     end
-    
     % calculate gradient of reward function
     grad = 0;
     for i = 1:size(trajInfo.cnt, 1)
@@ -55,5 +54,5 @@ if nargout == 2
         grad = grad+n*dlogPi(:, j);
     end
 end
-
+% fprintf('\nLeaving calLogLLH_BIRL');
 end

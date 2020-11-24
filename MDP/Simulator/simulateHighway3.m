@@ -26,18 +26,18 @@ nLanes  = mdp.nLanes;
 nGrids  = mdp.nGrids;
 carSize = mdp.carSize;
 
-gridw   = 10;
-gridh   = 20;
-nFrames = 12;
+gridw   = 50;
+gridh   = 30;
+nFrames = 15;
 unitTime = 0.1;
-act{1} = '';
+act{1} = 'no op';
 act{2} = 'Move left';
 act{3} = 'Move right';
 act{4} = 'Accelerate';
 act{5} = 'Deaccelerate';
 
 fig = figure('Position', [1200, 600, gridw*nLanes*10, gridh*nGrids*2], ...
-    'MenuBar', 'none');
+    'MenuBar', 'none', 'WindowStyle', 'docked');
 
 nCollisions = 0;
 for t = 1:(nSteps - 1)
@@ -46,11 +46,9 @@ for t = 1:(nSteps - 1)
     f  = full(mdp.F((a - 1)*mdp.nStates + s, :));
     ns = trajs(1, t + 1, 1);
     
-    [spd, x, y1, y2, y3]      = sid2info(s, nSpeeds, nLanes, nGrids);
-    [nspd, nx, ny1, ny2, ny3] = sid2info(ns, nSpeeds, nLanes, nGrids);
+    [spd, myx, Y] = sid2info(s, nSpeeds, nLanes, nGrids);
+    [nspd, nx, nY] = sid2info(ns, nSpeeds, nLanes, nGrids);
     nCollisions = nCollisions + f(1);
-    Y  = [y1, y2, y3];
-    nY = [ny1, ny2, ny3];
     
     z  = zeros(3, 1);
     nz = zeros(3, 1);
@@ -71,7 +69,7 @@ for t = 1:(nSteps - 1)
     end
     z  = nGrids - z;
     nz = nGrids - nz;
-    
+    x = myx;
     clf(fig);
     hold on;
     
